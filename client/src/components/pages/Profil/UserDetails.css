@@ -1,0 +1,35 @@
+.avatar {
+  position: absolute;
+  top: 150px;
+  font-family: "Poppins";
+  font-weight: bolder;
+  align-items: flex-start;
+  display: flex;
+}
+
+.contact {
+  font-family: "Poppins";
+  font-weight: 500;
+  /* left: 150px; */
+  display: flex;
+}
+
+.emoji {
+  position: absolute;
+  left: 70px;
+  top: 300px;
+  font-family: "Poppins";
+  display: inline;
+  align-items: flex-start;
+  display: flex;
+
+}
+
+.button {
+  /* position: absolute; */
+  top: 30px;
+  font-family: "Poppins";
+  /* display: flex; */
+  margin-bottom: 20px;
+  width: 45%;
+}
