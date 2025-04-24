@@ -12,7 +12,7 @@ export default class RecipesList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      recipes: [], // Store recipes here
+      recipes: [],
     };
   }
 
@@ -20,6 +20,9 @@ export default class RecipesList extends React.Component {
     this.fetchRecipes();
   }
 
+  // TODO: fix bug 
+  // steps: register -> select recipes from navbar
+  // intead of redirecting to recipes, it logs out
   fetchRecipes = async () => {
     try {
       const userID = getUserId();
@@ -30,21 +33,29 @@ export default class RecipesList extends React.Component {
     }
   };
 
-  addNewRecipe = async(newRecipe) => {
+  addNewRecipe = async (newRecipe) => {
     this.setState((prevState) => ({
       recipes: [...prevState.recipes, newRecipe],
     }));
+    this.fetchRecipes();
   };
+
+  removeRecipe = (recipeID) => {
+    this.setState((prevState) => ({
+      recipes: prevState.recipes.filter(recipe => recipe._id !== recipeID),
+    }));
+    this.fetchRecipes();
+};
 
   render() {
     return (
       <Layout>
         <Profil />
-        <VStack>
+        <VStack alignItems={"end"}>
           {this.state.recipes.map((recipe) => (
-            <Recipe key={recipe._id} {...recipe[0]} />
+            <Recipe key={recipe._id} {...recipe[0]} onRecipeRemoved={this.removeRecipe}/>
           ))}
-          <CreateForm onRecipeAdded={this.addNewRecipe} />
+          <CreateForm onRecipeAdded={this.addNewRecipe} isMaxRecipeListReached={this.state.recipes.length === 3} />
         </VStack>
       </Layout>
     );

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-export const Drink = mongoose.model('Drink', {
+export const Coffee = mongoose.model('Coffee', {
     id: {
         type: String
     },

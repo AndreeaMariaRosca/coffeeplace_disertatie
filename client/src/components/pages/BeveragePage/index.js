@@ -1,12 +1,10 @@
 import React from "react";
 import { VStack } from "@chakra-ui/react";
-import axios from "axios";
 import ReactPaginate from "react-paginate";
 import Layout from "../../navbar/Layout";
 import { BeverageList } from "./BeverageList";
 import { getBeverages } from "../../../utils/drinksApi";
 import "../index.css";
-import Profil from "../Profil";
 
 export default class BeveragePage extends React.Component {
   constructor(props) {

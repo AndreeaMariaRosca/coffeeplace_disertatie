@@ -96,7 +96,7 @@ class Register extends Component {
             try {
                 // todo: fix this in case register fails
                 this.functions.register(newUser)
-                this.props.navigate('/coffees');
+                this.props.navigate('/');
 
             } catch (err) {
                 console.warn(err)

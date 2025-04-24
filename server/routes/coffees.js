@@ -1,5 +1,5 @@
 import express from 'express';
-import { Drink as Coffee } from '../models/coffees.js';
+import { Coffee } from '../models/coffees.js';
 
 const coffeeRouter = express.Router();
 coffeeRouter.use(express.json());
@@ -41,7 +41,7 @@ coffeeRouter.put("/:id", async (req, res) => {
     const updatedData = req.body;
   
     try {
-      const updatedCoffee = await Drink.findByIdAndUpdate(id, updatedData, {
+      const updatedCoffee = await Coffee.findByIdAndUpdate(id, updatedData, {
         new: true,
       });
       res.status(200).send(updatedCoffee);

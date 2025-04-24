@@ -30,26 +30,10 @@ recipeRouter.get("/", async (req, res) => {
     }
 });
 
-// recipeRouter.get("/:id", async (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         const coffees = await Recipe.find({ userID: id });
-//         console.log(coffees);
-//         if (!coffees) return res.status(404).json({ error: 'Recipe coffees not found' });
-//         res.status(200).send(coffees);
-//     } catch (error) {
-//         res.status(500).send(`Error in retrieving all recipe coffees: ${error}`);
-//     }
-//     finally {
-//         res.end();
-//     }
-// });
-
 recipeRouter.post('/', async (request, response) => {
     const { body } = request;
 
     try {
-        console.log(`in recipe body=${JSON.stringify(body)}`);
         const recipe = await new Recipe(body).save();
         response.status(201).send(recipe);
     } catch (error) {
@@ -58,6 +42,20 @@ recipeRouter.post('/', async (request, response) => {
         return response.end();
     }
 
+});
+
+recipeRouter.delete('/:recipeID', async (req, res) => {
+    try {
+        console.log("in delete")
+        const { recipeID } = req.params;
+        const deletedRecipe = await Recipe.findOneAndDelete({personalityCoffeeID: recipeID});
+        if (!deletedRecipe) {
+            res.status(404).json('recipe not found')
+        }
+        res.status(200).send(deletedRecipe);
+    } catch (error) {
+        console.log("hopa error" + error)
+    }
 });
 
 export default recipeRouter;

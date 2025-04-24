@@ -52,7 +52,7 @@ const Header = () => {
     return (
         <header className={classes.header}>
             <div className={classes.header__content}>
-                <Link to="/coffees" className={classes.header__content__logo}>
+                <Link to="/recipes" className={classes.header__content__logo}>
                     caffeology
                 </Link>
                 <nav

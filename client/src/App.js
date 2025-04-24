@@ -10,6 +10,7 @@ import Profil from "./components/pages/Profil";
 import CoffeePage from "./components/pages/CoffeePage";
 import BeveragePage from "./components/pages/BeveragePage";
 import RecipesPage from "./components/pages/RecipesPage/RecipesList";
+import CartPage from "./components/pages/CartPage/Cart";
 import Layout from "./components/navbar/Layout";
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
           <Route path='/coffees' element={<CoffeePage />} />
           <Route path='/beverages' element={<BeveragePage />} />
           <Route path='/recipes' element={<RecipesPage />} />
+          <Route path='/cart' element={<CartPage />} />
           <Route path="*" element={<NoMatch />} />
 
         </Routes>

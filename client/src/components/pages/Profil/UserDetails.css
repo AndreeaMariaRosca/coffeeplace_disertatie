@@ -33,3 +33,13 @@
   margin-bottom: 20px;
   width: 45%;
 }
+
+.createRecipeButton {
+  position: absolute;
+  top: 30px;
+  font-family: "Poppins";
+  /* display: flex; */
+  margin-bottom: 20px;
+  width: 10%;
+  align-self: flex-end;
+}

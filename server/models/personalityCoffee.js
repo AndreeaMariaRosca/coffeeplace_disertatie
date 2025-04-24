@@ -29,6 +29,7 @@ export const PersonalityCoffee = mongoose.model('PersonalityCoffee', {
     },
     description: {
         type: String
-    }
+    },
+    price: { type: Number}
 
 }, 'personalityCoffees');
