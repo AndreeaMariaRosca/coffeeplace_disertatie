@@ -1,26 +1,35 @@
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   Heading,
   VStack,
   HStack,
   Text,
-  Divider,
   Spinner,
   Icon,
   useColorModeValue,
   Flex,
+  CloseButton,
+  Progress,
+  AlertTitle,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { getUserId } from "../../../utils/storage";
 import { FaShoppingCart } from "react-icons/fa";
 import Header from "../../navbar/Header";
+import { FaMoon, FaSun } from "react-icons/fa";
 
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertStatus, setAlertStatus] = useState("success");
+  const [progress, setProgress] = useState(100);
+
   const apiURL = "http://localhost:8080/api";
   const userId = getUserId();
 
@@ -41,6 +50,32 @@ const CartPage = () => {
 
     fetchCart();
   }, [userId]);
+
+  useEffect(() => {
+    if (!alertMessage) return;
+
+    let interval;
+    let timeout;
+    const duration = 4000; // 4 seconds
+    const step = 100; // ms
+    const decrement = (step / duration) * 100;
+
+    interval = setInterval(() => {
+      setProgress((prev) => Math.max(0, prev - decrement));
+    }, step);
+
+    timeout = setTimeout(() => {
+      setAlertMessage("");
+      setProgress(100);
+      clearInterval(interval);
+    }, duration);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [alertMessage]);
+
 
   const getTotal = () =>
     cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -100,11 +135,13 @@ const CartPage = () => {
     try {
       console.log(`userid = ${userId}`);
       await axios.post(`${apiURL}/cart/place-order`, { userId });
-      alert("Order placed successfully!");
       setCartItems([]);
+      setAlertStatus("success");
+      setAlertMessage("Order placed successfully!");
     } catch (err) {
       console.error("Order failed:", err);
-      alert("Failed to place order");
+      setAlertStatus("error");
+      setAlertMessage("Failed to place order");
     }
   };
 
@@ -120,6 +157,43 @@ const CartPage = () => {
   return (
     <>
       <Header />
+      {alertMessage && (
+        <Box
+          position="fixed"
+          top="100px"
+          right="20px"
+          zIndex="toast"
+          minW="300px"
+          maxW="90vw"
+        >
+          <Alert
+            status={alertStatus}
+            variant="surface" 
+            borderRadius="md"
+            boxShadow="lg"
+            padding={4}
+          >
+            <AlertIcon />
+            <Box flex="1">
+              <AlertTitle>{alertMessage}</AlertTitle>
+              <Progress
+                mt={2}
+                size="xs"
+                colorScheme={alertStatus === "success" ? "green" : "red"}
+                value={progress}
+                borderRadius="sm"
+              />
+            </Box>
+            <CloseButton
+              position="absolute"
+              right="8px"
+              top="8px"
+              onClick={() => setAlertMessage("")}
+            />
+          </Alert>
+        </Box>
+      )}
+
 
       {cartItems.length === 0 ? (
         <Flex

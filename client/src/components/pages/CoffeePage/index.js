@@ -15,7 +15,7 @@ export default class CoffeePage extends React.Component {
       offset: 0,
       tableData: [],
       orgtableData: [],
-      perPage: 10,
+      perPage: 13,
       currentPage: 0,
     };
 

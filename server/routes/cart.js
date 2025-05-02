@@ -1,3 +1,4 @@
+import nodemailer from 'nodemailer';
 import express from 'express';
 import { Beverage } from '../models/beverages.js';
 import { Coffee } from '../models/coffees.js';
@@ -130,7 +131,18 @@ cartRouter.put("/update", async (req, res) => {
     }
 });
 
-// POST /api/cart/place-order
+
+
+// configure the transporter
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    auth: {
+        user: 'andreea.rosca204@gmail.com', // your shop's email
+        pass: 'cmkn mosi vovu nzso', // for Gmail you might need an "App Password"
+    },
+});
+
 cartRouter.post("/place-order", async (req, res) => {
     const { userId } = req.body;
 
@@ -139,18 +151,29 @@ cartRouter.post("/place-order", async (req, res) => {
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ message: "Cart is empty" });
         }
-        console.log(`===in router`)
 
-        // Create order
         const order = await Order.create({
             userId,
             items: cart.items,
             totalPrice: cart.totalPrice
         });
-        console.log(`===after order`)
 
+        const orderSummary = cart.items.map(item => {
+            return `
+              Name: ${item.itemId.name}
+              Type: ${item.itemType}
+              Quantity: ${item.quantity}
+              Price Each: $${item.price.toFixed(2)}
+            `;
+        }).join('\n\n');
 
-        // Clear the cart
+        // Send the email
+        await transporter.sendMail({
+            to: 'roscamaria19@stud.ase.ro', // Shop's receiving email
+            subject: 'New Order Received!',
+            text: `You have a new order from user ${userId}:\n\n${orderSummary}\n\nTotal: $${cart.totalPrice}`,
+        });
+
         cart.items = [];
         cart.totalPrice = 0;
         await cart.save();

@@ -29,6 +29,10 @@ export const Coffee = mongoose.model('Coffee', {
     },
     hasIce: {
         type: Boolean
+    },
+    description: {
+        type: String,
+        required: true
     }
 
 }, 'coffees');

@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Box,
     Flex,
     Button,
-    Select,
     Text,
-    Spacer,
     useColorModeValue,
     useDisclosure,
     ModalCloseButton,
@@ -13,124 +11,260 @@ import {
     ModalOverlay,
     Modal,
     ModalContent,
-    HStack,
     Image,
-    ModalBody
+    ModalBody,
+    Icon,
+    Wrap,
+    WrapItem,
 } from "@chakra-ui/react";
+import { FaShoppingCart } from "react-icons/fa";
 import { addToCart } from "../../../utils/drinksApi";
-import badge1 from '../Profil/utils/badges/badge1.png';
+
+function importAll(r) {
+    const images = {};
+    r.keys().forEach((key) => {
+        const fileName = key.replace('./', '').split('.')[0];
+        images[fileName.toLowerCase()] = r(key);
+    });
+    return images;
+}
+
+const images = importAll(require.context('../Profil/utils/coffees', false, /\.(png|jpe?g|svg)$/));
 
 function Coffee(props) {
-    const secondaryBg = useColorModeValue("gray.200", "whiteAlpha.100");
-    const mainText = useColorModeValue("#1d1d1d", "whiteAlpha");
-
     const [editableCoffee, setEditableCoffee] = useState({ ...props });
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const handleInputChange = (e, field) => {
-        const value = e.target.value;
-        setEditableCoffee((prev) => ({ ...prev, [field]: value }));
-    };
+    const basePrice = props.price;
 
-    const handleSave = () => {
-        props.onSave(editableCoffee);
-    };
+    // Unified color values
+    const secondaryBg = useColorModeValue("gray.200", "whiteAlpha.100");
+    const mainText = useColorModeValue("#1d1d1d", "whiteAlpha.900");
+    const buttonBg = "#53589F";
+    const buttonHoverBg = "#7A7CC6";
+
+    // Reset editableCoffee when modal is closed
+    useEffect(() => {
+        if (!isOpen) {
+            setEditableCoffee({ ...props });  // Reset to original props when modal closes
+        }
+    }, [isOpen, props]);
 
     const handleAddToCart = async (coffeeId) => {
         try {
             await addToCart(coffeeId, 'Coffee', 1);
+            onClose();
         } catch (error) {
             console.error("Error adding to cart:", error);
         }
     };
 
+    const getImgByCoffeeName = (coffeeName) => {
+        const key = coffeeName.replace(/\s+/g, '').toLowerCase();
+        return images[key];
+    };
+
+    const handleCustomizationChange = (type, value) => {
+        const newCoffee = { ...editableCoffee, [type]: value };
+        let customPrice = basePrice;
+
+        if (newCoffee.milk !== props.milk && newCoffee.milk !== "none") {
+            customPrice += 0.5;
+        }
+        if (newCoffee.syrup !== props.syrup && newCoffee.syrup !== "none") {
+            customPrice += 0.5;
+        }
+
+        setEditableCoffee({ ...newCoffee, price: customPrice });
+    };
+
+
     return (
         <>
-            <Box onClick={onOpen} cursor="pointer">
-                <Flex
-                    borderRadius="20px"
-                    bg={secondaryBg}
-                    h="150px"
-                    w={{ base: "315px", md: "100%" }}
-                    direction="column"
-                    fontFamily="Poppins"
+            <Box
+                onClick={onOpen}
+                cursor="pointer"
+                borderRadius="xl"
+                bg={secondaryBg}
+                boxShadow="md"
+                transition="0.2s"
+                _hover={{ transform: "scale(1.02)" }}
+                w="100%"
+                maxW="400px"
+                overflow="hidden"
+            >
+                {/* Container for the image with white background */}
+                <Box
+                    w="100%"
+                    h="200px"
+                    bg="white" // white background for the image area
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
                 >
-                    <Box p="20px">
-                        <Text fontWeight="600" fontSize="2xl" color={mainText}>
-                            {editableCoffee.name}
+                    <Image
+                        src={getImgByCoffeeName(editableCoffee.name)}
+                        alt={editableCoffee.name}
+                        maxW="100%" // Ensures the image stays within container width
+                        maxH="100%" // Ensures the image stays within container height
+                        objectFit="contain" // The image will remain fully visible and centered
+                    />
+                </Box>
+
+                <Box p={4}>
+                    <Flex justify="space-between" align="start">
+                        <Box>
+                            <Text fontSize="xl" fontWeight="bold" color={mainText} mb={1}>
+                                {editableCoffee.name}
+                            </Text>
+                            <Text fontSize="sm" color={mainText}>
+                                {editableCoffee.temperature} • {editableCoffee.milk} milk • {editableCoffee.syrup} syrup
+                            </Text>
+                        </Box>
+                        <Text fontSize="md" fontWeight="semibold" color="teal.500">
+                            ${editableCoffee.price.toFixed(2)}
                         </Text>
-                    </Box>
-                    <Flex p="20px" align="center" gap={4} wrap="wrap">
-                        <Text color={mainText}>{editableCoffee.temperature}</Text>
-                        <Text color={mainText}>{editableCoffee.milk} milk</Text>
-                        <Text color={mainText}>{editableCoffee.syrup} syrup</Text>
-                        <Text color={mainText}>Price: ${editableCoffee.price.toFixed(2)}</Text>
-                        <Spacer />
-                        <Button
-                            background="#53589F"
-                            color="white"
-                            _hover={{ bg: "#7A7CC6" }}
-                            onClick={() => handleAddToCart(editableCoffee._id)}
-                        >
-                            Add to cart
-                        </Button>
                     </Flex>
-                </Flex>
+
+                    <Button
+                        leftIcon={<Icon as={FaShoppingCart} />}
+                        background={buttonBg}
+                        color="white"
+                        _hover={{ bg: buttonHoverBg }}
+                        mt={4}
+                        w="full"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart(editableCoffee._id);
+                        }}
+                    >
+                        Add to Cart
+                    </Button>
+                </Box>
             </Box>
 
-            <Modal
-                isOpen={isOpen}
-                onClose={() => {
-                    onClose();
-                }}
-                isCentered
-            >
+
+            <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
                 <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>{editableCoffee.name}</ModalHeader>
-                    <HStack p={4} spacing={4}>
-                        <Image src={badge1} boxSize="120px" objectFit="cover" />
-                        <ModalCloseButton />
-                        <ModalBody>
-                            <Text mb={4}>{editableCoffee.description}</Text>
+                <ModalContent
+                    bg="white"
+                    borderRadius="2xl"
+                    p={6}
+                    maxW="800px" // You can increase this value if needed
+                    w="90%"      // Makes it responsive
+                >
+                    <ModalHeader fontSize="2xl" fontWeight="bold" color={mainText}>
+                        {editableCoffee.name}
+                    </ModalHeader>
+                    <ModalCloseButton />
 
-                            <Select
-                                mb={2}
-                                value={editableCoffee.milk}
-                                onChange={(e) => handleInputChange(e, "milk")}
+                    <ModalBody pt={4}>
+                        <Flex direction="column" align="center" textAlign="center">
+                            <Box
+                                w="100%"
+                                h="200px"
+                                bg="white"
+                                display="flex"
+                                justifyContent="center"
+                                alignItems="center"
                             >
-                                <option value="regular">Regular</option>
-                                <option value="almond">Almond</option>
-                                <option value="soy">Soy</option>
-                                <option value="coconut">Coconut</option>
-                                <option value="none">None</option>
-                            </Select>
+                                <Image
+                                    src={getImgByCoffeeName(editableCoffee.name)}
+                                    alt={editableCoffee.name}
+                                    maxW="100%"
+                                    maxH="100%"
+                                    objectFit="contain"
+                                />
+                            </Box>
 
-                            <Select
-                                mb={4}
-                                value={editableCoffee.syrup}
-                                onChange={(e) => handleInputChange(e, "syrup")}
-                            >
-                                <option value="none">None</option>
-                                <option value="vanilla">Vanilla</option>
-                                <option value="white chocolate">White Chocolate</option>
-                                <option value="dark chocolate">Dark Chocolate</option>
-                                <option value="caramel">Caramel</option>
-                            </Select>
-
-                            <Text mt={6} fontStyle="italic">
-                                This product is only available {editableCoffee.temperature}
+                            <Text color={mainText} mb={4} fontSize="md">
+                                {editableCoffee.description}
                             </Text>
 
-                            <Flex mt="6" justify="space-between">
-                                <Button onClick={onClose}>Close</Button>
-                                {/* <Button colorScheme="green" onClick={handleSave}>Save</Button> */}
-                                <Button colorScheme="blue" onClick={() => handleAddToCart(editableCoffee._id)}>
+                            <Box w="100%" mb={6}>
+                                <Text fontWeight="medium" color={mainText} mb={2} textAlign="center">
+                                    Choose your milk:
+                                </Text>
+                                <Flex justify="center" flexWrap="wrap" gap={3}>
+                                    {["regular", "almond", "soy", "coconut", "none"].map((milk) => (
+                                        <Button
+                                            key={milk}
+                                            variant={editableCoffee.milk === milk ? "solid" : "outline"}
+                                            colorScheme="purple"
+                                            onClick={() =>
+                                                handleCustomizationChange('milk', milk)
+                                            }
+                                        >
+                                            {milk.charAt(0).toUpperCase() + milk.slice(1)}
+                                        </Button>
+                                    ))}
+                                </Flex>
+                            </Box>
+
+                            <Box w="100%" mb={6}>
+                                <Text fontWeight="medium" color={mainText} mb={2}>
+                                    Choose your syrup:
+                                </Text>
+                                <Flex justify="center" flexWrap="wrap" gap={3}>
+                                    {["vanilla", "white chocolate", "dark chocolate", "coconut", "salted caramel", "caramel", "irish cream", "hazelnuts", "none"].map((syrup) => (
+                                        <Button
+                                            key={syrup}
+                                            variant={editableCoffee.syrup === syrup ? "solid" : "outline"}
+                                            colorScheme="purple"
+                                            onClick={() =>
+                                                handleCustomizationChange('syrup', syrup)
+                                            }
+                                        >
+                                            {syrup.charAt(0).toUpperCase() + syrup.slice(1)}
+                                        </Button>
+                                    ))}
+                                </Flex>
+                            </Box>
+
+                            <Text mt={4} fontStyle="italic" color="gray.600">
+                                This product is only available {editableCoffee.temperature}.
+                            </Text>
+                            <Box
+                                border="1px"
+                                borderColor="gray.200"
+                                borderRadius="md"
+                                p={3}
+                                mt={4}
+                                w="100%"
+                                bg={useColorModeValue("gray.50", "whiteAlpha.100")}
+                                textAlign="center"
+                            >
+                                <Box mt={4} textAlign="center">
+                                    <Text fontSize="lg" fontWeight="semibold" color={mainText}>
+                                        {editableCoffee.price.toFixed(2) === props.price.toFixed(2) ? (
+                                            <>Price: <Text as="span" color="teal.500">${editableCoffee.price.toFixed(2)}</Text></>
+                                        ) : (
+                                            <>
+                                                Price: <Text as="span" textDecoration="line-through" color="gray.500">${props.price.toFixed(2)}</Text>{" "}
+                                                → <Text as="span" fontWeight="bold" color="green.500">${editableCoffee.price.toFixed(2)}</Text>
+                                                <Text fontSize="sm" color="gray.600" mt={1}>Includes custom milk or syrup (+$0.50 each)</Text>
+                                            </>
+                                        )}
+                                    </Text>
+                                </Box>
+                            </Box>
+
+
+                            <Flex mt={6} justify="flex-end" gap={3} w="100%">
+                                <Button onClick={onClose}>
+                                    Close
+                                </Button>
+                                <Button
+                                    background={buttonBg}
+                                    color="white"
+                                    _hover={{ bg: buttonHoverBg }}
+                                    onClick={() => handleAddToCart(editableCoffee._id)}
+                                >
                                     Add to cart
                                 </Button>
                             </Flex>
-                        </ModalBody>
-                    </HStack>
+                        </Flex>
+                    </ModalBody>
                 </ModalContent>
             </Modal>
         </>

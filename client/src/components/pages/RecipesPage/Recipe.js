@@ -91,7 +91,7 @@ function Recipe(props) {
                         <Flex direction="column" mr="10px">
                             <Text
                                 color={mainText}
-                                whiteSpace={description?.length > 80 ? "nowrap" : "normal"}
+                                whiteSpace={description?.length > 80 ? "nowrap" : "regular"}
                                 overflow={description?.length > 80 ? "hidden" : "visible"}
                                 textOverflow={description?.length > 80 ? "ellipsis" : "unset"}
                                 maxW="300px"
