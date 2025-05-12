@@ -15,12 +15,12 @@ recipeRouter.get("/", async (req, res) => {
 
         if (!recipes) return res.status(404).json({ error: 'Recipes not found' });
 
-        const personalityCoffees = [];
+        let personalityCoffees = [];
         for (let coffee of recipes) {
-            const personalityCoffee = await PersonalityCoffee.find({ _id: coffee.personalityCoffeeID });
+            const personalityCoffee = await PersonalityCoffee.findOne({ _id: coffee.personalityCoffeeID });
             personalityCoffees.push(personalityCoffee);
         }
-
+        console.log(`====in get personalityCoffees = ${JSON.stringify(personalityCoffees)}`)
         res.status(200).send(personalityCoffees);
     } catch (error) {
         res.status(500).send(`Error in retrieving all personality coffees: ${error}`);
@@ -34,10 +34,11 @@ recipeRouter.post('/', async (request, response) => {
     const { body } = request;
 
     try {
+        console.log(`====body in post ${JSON.stringify(body)}`)
         const recipe = await new Recipe(body).save();
         response.status(201).send(recipe);
     } catch (error) {
-        response.status(500).json({ error: 'Internal server error!' })
+        response.status(500).json({ error: `Internal server error: ${error}` })
     } finally {
         return response.end();
     }

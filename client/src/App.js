@@ -6,12 +6,12 @@ import './App.css';
 import Login from './components/pages/Login/Login';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import Register from "./components/pages/SignUp/Register";
-import Profil from "./components/pages/Profil";
 import CoffeePage from "./components/pages/CoffeePage";
 import BeveragePage from "./components/pages/BeveragePage";
-import RecipesPage from "./components/pages/RecipesPage/RecipesList";
+import RecipesPage from "./components/pages/RecipesPage/RecipesListWrapper";
+import Profile from "./components/pages/Profil/index";
 import CartPage from "./components/pages/CartPage/Cart";
-import Layout from "./components/navbar/Layout";
+import QuizPage from "./components/pages/QuizPage/QuizPage/QuizPage";
 
 function App() {
 
@@ -25,7 +25,9 @@ function App() {
           <Route path='/coffees' element={<CoffeePage />} />
           <Route path='/beverages' element={<BeveragePage />} />
           <Route path='/recipes' element={<RecipesPage />} />
+          <Route path='/profile' element={<Profile />} />
           <Route path='/cart' element={<CartPage />} />
+          <Route path="/personality-coffee" element={<QuizPage />} />
           <Route path="*" element={<NoMatch />} />
 
         </Routes>

@@ -17,6 +17,7 @@ import beverageRouter from './routes/beverages.js';
 import cartRouter from './routes/cart.js';
 import personalityCoffeeRouter from './routes/personalityCoffees.js';
 import recipeRouter from './routes/recipes.js';
+import orderRouter from './routes/order.js';
 dotenv.config({path: './config/config.env'})
 connectDB();
 
@@ -36,7 +37,7 @@ app.use("/", userRouter);
 app.use("/api/form", formRouter);
 app.use("/api/cart", cartRouter);
 
-// existing coffees/beverages available for users
+app.use("/api/orders", orderRouter);
 app.use("/api/coffees", coffeeRouter);
 app.use("/api/beverages", beverageRouter);
 app.use("/api/personalityCoffee", personalityCoffeeRouter);

@@ -145,6 +145,21 @@ const CartPage = () => {
     }
   };
 
+  const handleDeleteItem = async (itemId, itemType) => {
+    try {
+      await axios.delete(`${apiURL}/cart/remove`, {
+        data: { userId, itemId, itemType },
+      });
+
+      setCartItems((prev) => prev.filter((item) => item._id !== itemId));
+      setAlertStatus("success");
+      setAlertMessage("Item removed from cart.");
+    } catch (err) {
+      console.error("Failed to remove item:", err);
+      setAlertStatus("error");
+      setAlertMessage("Failed to remove item.");
+    }
+  };
 
 
   if (loading)
@@ -168,7 +183,7 @@ const CartPage = () => {
         >
           <Alert
             status={alertStatus}
-            variant="surface" 
+            variant="surface"
             borderRadius="md"
             boxShadow="lg"
             padding={4}
@@ -236,11 +251,9 @@ const CartPage = () => {
                       <Text fontWeight="bold" fontSize="xl" mb={1}>
                         {item.name}
                       </Text>
-                      <Text fontSize="sm" color="gray.500">
-                        Type: {item.type}
-                      </Text>
                       {renderItemDetails(item)}
                     </Box>
+
                     <Box textAlign="right">
                       <HStack spacing={2} justify="flex-end" align="center" mt={2}>
                         <Button size="sm" onClick={() => updateQuantity(item._id, -1)}>-</Button>
@@ -250,9 +263,19 @@ const CartPage = () => {
                       <Text fontSize="sm" color="gray.500">
                         Subtotal: ${(item.price * item.quantity).toFixed(2)}
                       </Text>
+                      <Button
+                        mt={2}
+                        size="xs"
+                        colorScheme="red"
+                        variant="outline"
+                        onClick={() => handleDeleteItem(item._id, item.type)}
+                      >
+                        Remove
+                      </Button>
                     </Box>
                   </HStack>
                 </Box>
+
               ))}
             </VStack>
 

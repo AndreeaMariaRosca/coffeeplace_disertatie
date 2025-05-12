@@ -33,6 +33,7 @@ const images = importAll(require.context('../Profil/utils/coffees', false, /\.(p
 
 function Coffee(props) {
     const [editableCoffee, setEditableCoffee] = useState({ ...props });
+    const [quantity, setQuantity] = useState(1);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const basePrice = props.price;
@@ -52,8 +53,18 @@ function Coffee(props) {
 
     const handleAddToCart = async (coffeeId) => {
         try {
-            await addToCart(coffeeId, 'Coffee', 1);
+            await addToCart(coffeeId, 'Coffee', quantity);
             onClose();
+            setQuantity(1);
+        } catch (error) {
+            console.error("Error adding to cart:", error);
+        }
+    };
+
+    const handleCloseBtn = async () => {
+        try {
+            onClose();
+            setQuantity(1);
         } catch (error) {
             console.error("Error adding to cart:", error);
         }
@@ -149,9 +160,11 @@ function Coffee(props) {
                 <ModalContent
                     bg="white"
                     borderRadius="2xl"
-                    p={6}
-                    maxW="800px" // You can increase this value if needed
-                    w="90%"      // Makes it responsive
+                    p={4}
+                    maxW="600px"
+                    w="90%"
+                    maxH="90vh"
+                    overflowY="auto"
                 >
                     <ModalHeader fontSize="2xl" fontWeight="bold" color={mainText}>
                         {editableCoffee.name}
@@ -185,15 +198,17 @@ function Coffee(props) {
                                 <Text fontWeight="medium" color={mainText} mb={2} textAlign="center">
                                     Choose your milk:
                                 </Text>
-                                <Flex justify="center" flexWrap="wrap" gap={3}>
+                                <Flex justify="center" flexWrap="wrap" gap={2}>
                                     {["regular", "almond", "soy", "coconut", "none"].map((milk) => (
                                         <Button
                                             key={milk}
+                                            size="sm"
+                                            px={3}
+                                            py={1}
+                                            fontSize="sm"
                                             variant={editableCoffee.milk === milk ? "solid" : "outline"}
                                             colorScheme="purple"
-                                            onClick={() =>
-                                                handleCustomizationChange('milk', milk)
-                                            }
+                                            onClick={() => handleCustomizationChange("milk", milk)}
                                         >
                                             {milk.charAt(0).toUpperCase() + milk.slice(1)}
                                         </Button>
@@ -205,25 +220,61 @@ function Coffee(props) {
                                 <Text fontWeight="medium" color={mainText} mb={2}>
                                     Choose your syrup:
                                 </Text>
-                                <Flex justify="center" flexWrap="wrap" gap={3}>
-                                    {["vanilla", "white chocolate", "dark chocolate", "coconut", "salted caramel", "caramel", "irish cream", "hazelnuts", "none"].map((syrup) => (
+                                <Flex justify="center" flexWrap="wrap" gap={2}>
+                                    {[
+                                        "vanilla",
+                                        "white chocolate",
+                                        "dark chocolate",
+                                        "coconut",
+                                        "salted caramel",
+                                        "caramel",
+                                        "irish cream",
+                                        "hazelnuts",
+                                        "none",
+                                    ].map((syrup) => (
                                         <Button
                                             key={syrup}
+                                            size="sm"
+                                            px={3}
+                                            py={1}
+                                            fontSize="sm"
                                             variant={editableCoffee.syrup === syrup ? "solid" : "outline"}
                                             colorScheme="purple"
-                                            onClick={() =>
-                                                handleCustomizationChange('syrup', syrup)
-                                            }
+                                            onClick={() => handleCustomizationChange("syrup", syrup)}
                                         >
                                             {syrup.charAt(0).toUpperCase() + syrup.slice(1)}
                                         </Button>
                                     ))}
                                 </Flex>
                             </Box>
+                            {/* Quantity Selector */}
+                            <Box mt={6} textAlign="center">
+                                <Text fontSize="md" color={mainText} mb={2}>
+                                    Quantity:
+                                </Text>
+                                <Flex justify="center" align="center" gap={4}>
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                                        background="gray.200"
+                                        _hover={{ bg: "gray.300" }}
+                                    >
+                                        −
+                                    </Button>
+                                    <Text fontSize="lg" fontWeight="bold">
+                                        {quantity}
+                                    </Text>
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setQuantity((q) => q + 1)}
+                                        background="gray.200"
+                                        _hover={{ bg: "gray.300" }}
+                                    >
+                                        +
+                                    </Button>
+                                </Flex>
+                            </Box>
 
-                            <Text mt={4} fontStyle="italic" color="gray.600">
-                                This product is only available {editableCoffee.temperature}.
-                            </Text>
                             <Box
                                 border="1px"
                                 borderColor="gray.200"
@@ -234,26 +285,24 @@ function Coffee(props) {
                                 bg={useColorModeValue("gray.50", "whiteAlpha.100")}
                                 textAlign="center"
                             >
-                                <Box mt={4} textAlign="center">
-                                    <Text fontSize="lg" fontWeight="semibold" color={mainText}>
-                                        {editableCoffee.price.toFixed(2) === props.price.toFixed(2) ? (
-                                            <>Price: <Text as="span" color="teal.500">${editableCoffee.price.toFixed(2)}</Text></>
-                                        ) : (
-                                            <>
-                                                Price: <Text as="span" textDecoration="line-through" color="gray.500">${props.price.toFixed(2)}</Text>{" "}
-                                                → <Text as="span" fontWeight="bold" color="green.500">${editableCoffee.price.toFixed(2)}</Text>
-                                                <Text fontSize="sm" color="gray.600" mt={1}>Includes custom milk or syrup (+$0.50 each)</Text>
-                                            </>
-                                        )}
+                                <Text fontSize="lg" fontWeight="semibold" color={mainText}>
+                                    Total Price:{" "}
+                                    <Text as="span" fontWeight="bold" color="teal.500">
+                                        ${(editableCoffee.price * quantity).toFixed(2)}
                                     </Text>
-                                </Box>
+                                </Text>
+                                <Text fontSize="sm" color="gray.600" mt={1}>
+                                    Custom milk or syrup adds $0.50 each.
+                                </Text>
                             </Box>
+
+                            <Text mt={4} fontStyle="italic" color="gray.600">
+                                This product is only available {editableCoffee.temperature}.
+                            </Text>
 
 
                             <Flex mt={6} justify="flex-end" gap={3} w="100%">
-                                <Button onClick={onClose}>
-                                    Close
-                                </Button>
+                                <Button onClick={() => handleCloseBtn()}>Close</Button>
                                 <Button
                                     background={buttonBg}
                                     color="white"
@@ -267,6 +316,7 @@ function Coffee(props) {
                     </ModalBody>
                 </ModalContent>
             </Modal>
+
         </>
     );
 }

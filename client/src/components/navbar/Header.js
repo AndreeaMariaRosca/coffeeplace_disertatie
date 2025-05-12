@@ -60,8 +60,13 @@ const Header = () => {
                 >
                     <ul>
                         <li>
+                            <Link to="/profile" onClick={menuToggleHandler}>
+                                PROFILE
+                            </Link>
+                        </li>
+                        <li>
                             <Link to="/recipes" onClick={menuToggleHandler}>
-                                Your recipes
+                                RECIPES
                             </Link>
                         </li>
                         <li>

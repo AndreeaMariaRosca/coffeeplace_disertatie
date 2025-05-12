@@ -1,17 +1,19 @@
 .avatar {
-  position: absolute;
-  top: 150px;
   font-family: "Poppins";
   font-weight: bolder;
-  align-items: flex-start;
-  display: flex;
+  /* display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 80px;
+  width: 100%; */
 }
 
 .contact {
   font-family: "Poppins";
   font-weight: 500;
-  /* left: 150px; */
   display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .emoji {
@@ -35,7 +37,7 @@
 }
 
 .createRecipeButton {
-  position: absolute;
+  position: relative;
   top: 30px;
   font-family: "Poppins";
   /* display: flex; */

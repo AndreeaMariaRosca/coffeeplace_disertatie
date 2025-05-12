@@ -42,7 +42,7 @@ personalityCoffeeRouter.get('/:score', async (req, res) => {
     }
 });
 
-personalityCoffeeRouter.get('/:id', async (req, res) => {
+personalityCoffeeRouter.get('/by-id/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const coffees = await PersonalityCoffee.findById(id);

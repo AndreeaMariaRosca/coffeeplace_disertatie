@@ -1,17 +1,17 @@
 import './ProfilClient.css';
 import UserDetails from '../UserDetails';
-import CreateForm from './CreateForm';
+import OrderHistory from '../../OrderHistoryPage/OrderHistory';
+
 import Layout from "../../../navbar/Layout";
-import { VStack } from '@chakra-ui/react';
 
 const ProfilClient = ({ user }) => {
     console.log(`profil ${JSON.stringify(user)}`);
 
     return (
-        <>
+        <Layout>
             <UserDetails user={user}/>
-            {/* <CreateForm /> */}
-        </>
+            <OrderHistory userId={user._id} />
+        </Layout>
     )
 }
 

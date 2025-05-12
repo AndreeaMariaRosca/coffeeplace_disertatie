@@ -27,9 +27,15 @@ export const PersonalityCoffee = mongoose.model('PersonalityCoffee', {
         minValue: Number,
         maxValue: Number,
     },
+    shortDescription: {
+        type: String
+    },
     description: {
         type: String
     },
-    price: { type: Number}
+    price: { 
+        type: Number,
+        required: true
+    }
 
 }, 'personalityCoffees');

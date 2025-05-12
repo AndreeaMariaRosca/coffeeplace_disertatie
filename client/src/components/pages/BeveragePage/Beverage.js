@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Box,
     Flex,
@@ -11,92 +11,178 @@ import {
     ModalContent,
     ModalHeader,
     ModalBody,
-    ModalFooter,
     ModalCloseButton,
     Image,
-    HStack,
+    Icon,
 } from "@chakra-ui/react";
-import badge1 from '../Profil/utils/badges/badge1.png';
+import { FaShoppingCart } from "react-icons/fa";
 import { addToCart } from "../../../utils/drinksApi";
 
+// Helper function if you have multiple images
+function importAll(r) {
+    const images = {};
+    r.keys().forEach((key) => {
+        const fileName = key.replace('./', '').split('.')[0];
+        images[fileName.toLowerCase()] = r(key);
+    });
+    return images;
+}
+const images = importAll(require.context('../Profil/utils/beverages', false, /\.(png|jpe?g|svg)$/));
 
 function Beverage(props) {
     const secondaryBg = useColorModeValue("gray.200", "whiteAlpha.100");
-    const mainText = useColorModeValue("#1d1d1d", "whiteAlpha");
+    const mainText = useColorModeValue("#1d1d1d", "whiteAlpha.900");
+    const buttonBg = "#53589F";
+    const buttonHoverBg = "#7A7CC6";
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [quantity, setQuantity] = useState(1);
+
+
+    const getImgByName = (name) => {
+        const key = name.replace(/\s+/g, '').toLowerCase();
+        return images[key];
+    };
 
     const handleAddToCart = async (beverageId) => {
         try {
-            // TODO: to add multiple beverages
-            await addToCart(beverageId, 'Beverage', 1);
+
+            await addToCart(beverageId, 'Beverage', quantity);
             onClose();
+            setQuantity(1);
         } catch (error) {
-            console.error("Error adding to cart:", error);
+            console.error("Error adding beverage to cart:", error);
         }
     };
 
     return (
         <>
-            <Flex
-                borderRadius="20px"
+            <Box
+                onClick={onOpen}
+                cursor="pointer"
+                borderRadius="xl"
                 bg={secondaryBg}
-                h="150px"
-                w={{ base: "315px", md: "100%" }}
-                direction="column"
-                fontFamily="Poppins"
+                boxShadow="md"
+                transition="0.2s"
+                _hover={{ transform: "scale(1.02)" }}
+                w="100%"
+                maxW="400px"
+                overflow="hidden"
             >
-                <Box p="20px">
-                    <Text fontWeight="600" w="100%" fontSize="2xl" color={mainText}>
-                        {props.name}
-                    </Text>
+                {/* Image area with white background */}
+                <Box
+                    w="100%"
+                    h="200px"
+                    bg="white"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                >
+                    <Image
+                        src={getImgByName(props.name)}
+                        alt={props.name}
+                        maxW="100%"
+                        maxH="100%"
+                        objectFit="contain"
+                    />
                 </Box>
-                <Flex w="100%" p="20px" height="100%">
-                    <Flex direction="column" flex="1" mr="10px">
-                        <Text color={mainText}>{props.price}</Text>
+
+                <Box p={4}>
+                    <Flex justify="space-between" align="start">
+                        <Text fontSize="xl" fontWeight="bold" color={mainText}>
+                            {props.name}
+                        </Text>
+                        <Text fontSize="md" fontWeight="semibold" color="teal.500">
+                            ${props.price.toFixed(2)}
+                        </Text>
                     </Flex>
-                    <div>
-                        <Button
-                            background='#53589F'
-                            color={'white'}
-                            _hover={{ bg: '#7A7CC6' }}
-                            mr="10px"
-                            onClick={onOpen}
-                        >
-                            Add to cart
-                        </Button>
-                    </div>
-                </Flex>
-            </Flex>
 
-            <Modal isOpen={isOpen} onClose={onClose} isCentered>
+                    <Button
+                        leftIcon={<Icon as={FaShoppingCart} />}
+                        background={buttonBg}
+                        color="white"
+                        _hover={{ bg: buttonHoverBg }}
+                        mt={4}
+                        w="full"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart(props._id);
+                        }}
+                    >
+                        Add to Cart
+                    </Button>
+                </Box>
+            </Box>
+
+            <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
                 <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>{props.name}</ModalHeader>
-                    <HStack>
+                <ModalContent bg="white" borderRadius="2xl" p={6} maxW="600px" w="90%">
+                    <ModalHeader fontSize="2xl" fontWeight="bold" color={mainText}>
+                        {props.name}
+                    </ModalHeader>
+                    <ModalCloseButton />
 
-                        <Image
-                            src={badge1}
-                            boxSize="120px"
-                            objectFit="cover"
-                        />
-                        <ModalCloseButton />
-                        <ModalBody>
-                            <Text>{props.price}</Text>
-                        </ModalBody>
-                    </HStack>
-                    <ModalBody>
-                        <Flex mt="4" justify="space-between">
-                            <Button onClick={onClose}>
-                                Close
-                            </Button>
-                            <Button onClick={() => handleAddToCart(props._id)}>
-                                Add to cart
-                            </Button>
+                    <ModalBody pt={4}>
+                        <Flex direction="column" align="center" textAlign="center">
+                            <Box
+                                w="100%"
+                                h="200px"
+                                bg="white"
+                                display="flex"
+                                justifyContent="center"
+                                alignItems="center"
+                            >
+                                <Image
+                                    src={getImgByName(props.name)}
+                                    alt={props.name}
+                                    maxW="100%"
+                                    maxH="100%"
+                                    objectFit="contain"
+                                />
+                            </Box>
+
+                            <Text color={mainText} mb={4} fontSize="md">
+                                {props.description}
+                            </Text>
+
+                            <Text fontSize="md" fontWeight="medium" color="gray.600" mt={2}>
+                                Total: ${(props.price * quantity).toFixed(2)}
+                            </Text>
+
+                            {/* Quantity controls */}
+                            <Flex align="center" justify="center" gap={3} mt={4}>
+                                <Button
+                                    size="sm"
+                                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                                >
+                                    −
+                                </Button>
+                                <Text fontSize="lg">{quantity}</Text>
+                                <Button size="sm" onClick={() => setQuantity((q) => q + 1)}>
+                                    +
+                                </Button>
+                            </Flex>
+
+                            <Flex mt={6} justify="flex-end" gap={3} w="100%">
+                                <Button onClick={() => {
+                                    setQuantity(1);
+                                    onClose();
+                                }}>
+                                    Close
+                                </Button>
+                                <Button
+                                    background={buttonBg}
+                                    color="white"
+                                    _hover={{ bg: buttonHoverBg }}
+                                    onClick={() => handleAddToCart(props._id)}
+                                >
+                                    Add to cart
+                                </Button>
+                            </Flex>
                         </Flex>
                     </ModalBody>
-
                 </ModalContent>
             </Modal>
+
         </>
     );
 }

@@ -9,7 +9,11 @@ export const Beverage = mongoose.model('Beverage', {
         required: true
     },
     price: {
-        type: Number
+        type: Number,
+        required: true
+    },
+    description: {
+        type: String
     }
 }, "beverages");
 
