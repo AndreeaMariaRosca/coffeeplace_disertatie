@@ -14,6 +14,7 @@ import {
     ModalCloseButton,
     Image,
     Icon,
+    useToast
 } from "@chakra-ui/react";
 import { FaShoppingCart } from "react-icons/fa";
 import { addToCart } from "../../../utils/drinksApi";
@@ -36,7 +37,7 @@ function Beverage(props) {
     const buttonHoverBg = "#7A7CC6";
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [quantity, setQuantity] = useState(1);
-
+    const toast = useToast();
 
     const getImgByName = (name) => {
         const key = name.replace(/\s+/g, '').toLowerCase();
@@ -49,6 +50,14 @@ function Beverage(props) {
             await addToCart(beverageId, 'Beverage', quantity);
             onClose();
             setQuantity(1);
+                        toast({
+                title: "Added to cart",
+                description: `${props.name} (${quantity}) has been added to your cart.`,
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+                position: "top",
+            });
         } catch (error) {
             console.error("Error adding beverage to cart:", error);
         }

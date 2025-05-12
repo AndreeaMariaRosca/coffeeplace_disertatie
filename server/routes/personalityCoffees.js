@@ -7,11 +7,24 @@ personalityCoffeeRouter.use(express.json());
 personalityCoffeeRouter.get("/", async (_, res) => {
     try {
         const coffees = await PersonalityCoffee.find();
-        console.log(coffees);
         if (!coffees) return res.status(404).json({ error: 'Personality coffee not found' });
         res.status(200).send(coffees);
     } catch (error) {
         res.status(500).send(`Error in retrieving all personality coffees: ${error}`);
+    }
+    finally {
+        res.end();
+    }
+});
+
+personalityCoffeeRouter.get('/by-id/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const coffees = await PersonalityCoffee.findById(id);
+        if (!coffees) return res.status(404).json({ error: 'Recipe coffees not found' });
+        res.status(200).send(coffees);
+    } catch (error) {
+        res.status(500).send(`Error in retrieving all recipe coffees: ${error}`);
     }
     finally {
         res.end();
@@ -38,21 +51,6 @@ personalityCoffeeRouter.get('/:score', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: `Error in retrieving the coffee: ${error.message}` });
     } finally {
-        res.end();
-    }
-});
-
-personalityCoffeeRouter.get('/by-id/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const coffees = await PersonalityCoffee.findById(id);
-        console.log(coffees);
-        if (!coffees) return res.status(404).json({ error: 'Recipe coffees not found' });
-        res.status(200).send(coffees);
-    } catch (error) {
-        res.status(500).send(`Error in retrieving all recipe coffees: ${error}`);
-    }
-    finally {
         res.end();
     }
 });

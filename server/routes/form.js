@@ -7,10 +7,8 @@ import { Form } from '../models/form.js';
 
 formRouter.post('/', async (request, response) => {
     const body = request.body;
-    console.log(`post /api/form being called`);
 
     try {
-        console.log(`body=${JSON.stringify(body)}`);
         const form = await new Form(body).save();
         response.status(201).send(form);
     } catch (error) {

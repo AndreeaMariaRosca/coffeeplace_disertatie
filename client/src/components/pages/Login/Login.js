@@ -43,10 +43,8 @@ class Login extends Component {
     }
 
     onSubmit(e) {
-        console.log("in submittt!");
         e.preventDefault();
         const isValid = this.validateUser();
-        console.log("isValid: ", isValid);
 
         if (!isValid) {
             return;
@@ -57,11 +55,8 @@ class Login extends Component {
             password: this.state.password
         }
 
-        console.log("email: ", user.email, " password: ", user.password);
-
         this.functions.login(user)
             .then(loggedInUser => {
-                console.log(`=====result after login ${JSON.stringify(loggedInUser)}`);
                 storeUserDetails(loggedInUser);
                 this.props.navigate('coffees')
         }).catch(() => {
@@ -97,7 +92,6 @@ class Login extends Component {
 )
 
     render() {
-
         return (
             <div className="wrapper" >
                 <div className="form-wrapper" onSubmit={this.onSubmit}>
@@ -118,11 +112,6 @@ class Login extends Component {
                         <Link to="/coffees">
                             <Button type="submit" background='#53589F' color={'white'} _hover={{ bg: '#7A7CC6' }} onSubmit={this.onSubmit}>Logare</Button>
                         </Link>
-                        {/* {
-                            this.state.error ? (<Alert> {this.state.error}
-                            </Alert>) : <a href='/profil'></a>
-
-                        } */}
 
                         <br></br>
                         <br></br>

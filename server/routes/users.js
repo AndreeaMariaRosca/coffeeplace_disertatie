@@ -24,7 +24,6 @@ userRouter.post("/api/register", async (req, res) => {
   const userRequest = { ...body, password };
 
   const user = new User(userRequest);
-  console.log('user', user);
   const createdUser = await user.save();
   let token = jwt.sign({ _id: createdUser._id }, "process.env.SECRET_KEY")
   res.header('Authorization', token)
@@ -39,8 +38,6 @@ userRouter.post("/api/login", async (req, res) => {
   try {
 
     const user = await User.findOne({ email: body.email })
-    console.log('=====user:', user);
-    console.log('BODY' + JSON.stringify(body));
 
     if (!user) return res.status(401).json({ error: "Not allowed to login" });
 

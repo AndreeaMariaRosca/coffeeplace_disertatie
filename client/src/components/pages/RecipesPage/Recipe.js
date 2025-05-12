@@ -92,7 +92,7 @@ function Recipe(props) {
                 boxShadow="lg"
                 borderRadius="2xl"
                 p={6}
-                width="100%" // Ensure it takes up full width
+                width="100%"
                 maxW={{ base: "100%", md: "1000px", lg: "1200px" }}
                 mx="auto"
                 my={6}
@@ -101,7 +101,7 @@ function Recipe(props) {
                     <Image
                         src={getImgByCoffeeName(name)}
                         alt={name}
-                        boxSize={{ base: "150px", md: "220px" }} // Adjust image size based on screen size
+                        boxSize={{ base: "150px", md: "220px" }}
                         objectFit="contain"
                         borderRadius="lg"
                         shadow="md"

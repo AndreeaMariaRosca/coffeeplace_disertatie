@@ -1,6 +1,5 @@
 import { EventEmitter } from 'fbemitter'
 import axios from 'axios'
-// import jwt_decode from 'jwt-decode'
 
 const SERVER = "http://localhost:8080/api"
 
@@ -53,9 +52,7 @@ class UserFunctions {
   }
 
   async getUserByEmail(userEmail) {
-    // let token = localStorage.getItem("usertoken");
     return axios.get(`${SERVER}/findUserByEmail/${userEmail}`,
-      // { headers: { "Authorization": `${token}`, 'Content-Type': 'application/json' } }
     )
       .then((response) => {
         this.emitter.emit("GET_USER_SUCCESS");

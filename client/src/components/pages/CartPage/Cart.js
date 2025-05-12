@@ -16,12 +16,20 @@ import {
   Progress,
   AlertTitle,
 } from "@chakra-ui/react";
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+} from "@chakra-ui/react";
 import axios from "axios";
+import { useRef } from "react";
+
 import { getUserId } from "../../../utils/storage";
 import { FaShoppingCart } from "react-icons/fa";
 import Header from "../../navbar/Header";
-import { FaMoon, FaSun } from "react-icons/fa";
-
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -29,6 +37,12 @@ const CartPage = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertStatus, setAlertStatus] = useState("success");
   const [progress, setProgress] = useState(100);
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [itemDetailsMap, setItemDetailsMap] = useState({});
+
+  const cancelRef = useRef();
 
   const apiURL = "http://localhost:8080/api";
   const userId = getUserId();
@@ -40,13 +54,29 @@ const CartPage = () => {
     const fetchCart = async () => {
       try {
         const res = await axios.get(`${apiURL}/cart?userId=${userId}`);
-        setCartItems(res.data);
+        const items = res.data;
+        setCartItems(items);
+
+        const detailRequests = items.map((item) =>
+          axios.get(`${apiURL}/${item.type.toLowerCase()}s/${item.itemId}`)
+        );
+
+        const detailResponses = await Promise.all(detailRequests);
+        const detailsMap = {};
+
+        detailResponses.forEach((response, index) => {
+          const itemId = items[index]._id; // cart item _id, not the original item's _id
+          detailsMap[itemId] = response.data;
+        });
+
+        setItemDetailsMap(detailsMap);
       } catch (err) {
-        console.error("Failed to load cart:", err);
+        console.error("Failed to load cart or details:", err);
       } finally {
         setLoading(false);
       }
     };
+
 
     fetchCart();
   }, [userId]);
@@ -84,19 +114,21 @@ const CartPage = () => {
     cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const renderItemDetails = (item) => {
+    const details = itemDetailsMap[item._id];
+    if (!details) return <Text fontSize="sm" color="gray.400">Loading details...</Text>;
+
     if (item.type === "Coffee" || item.type === "PersonalityCoffee") {
       return (
         <VStack spacing={1} align="start" mt={2} fontSize="sm" color="gray.600">
-          <Text>Milk: {item.milk}</Text>
-          <Text>Syrup: {item.syrup}</Text>
-          <Text>Temperature: {item.temperature}</Text>
-          <Text>Ice: {item.hasIce ? "Yes" : "No"}</Text>
-          {item.type === "PersonalityCoffee" && item.description && (
+          <Text>Milk: {details.milk}</Text>
+          <Text>Syrup: {details.syrup}</Text>
+          <Text>Temperature: {details.temperature}</Text>
+          {item.type === "PersonalityCoffee" && details.description && (
             <>
-              <Text>Description: {item.description}</Text>
-              {item.score && (
+              <Text>Description: {details.description}</Text>
+              {details.score && (
                 <Text>
-                  Score Range: {item.score.minValue} - {item.score.maxValue}
+                  Score Range: {details.score.minValue} - {details.score.maxValue}
                 </Text>
               )}
             </>
@@ -105,8 +137,9 @@ const CartPage = () => {
       );
     }
 
-    return null; // Beverage doesn't need extra fields
+    return null;
   };
+
 
   const updateQuantity = async (itemId, change) => {
     try {
@@ -119,7 +152,6 @@ const CartPage = () => {
       });
 
       setCartItems(updatedItems); // Update local state for immediate UI feedback
-      console.log(`cartItemId = ${itemId}`)
 
       await axios.put(`${apiURL}/cart/update`, {
         userId,
@@ -133,7 +165,6 @@ const CartPage = () => {
 
   const handlePlaceOrder = async () => {
     try {
-      console.log(`userid = ${userId}`);
       await axios.post(`${apiURL}/cart/place-order`, { userId });
       setCartItems([]);
       setAlertStatus("success");
@@ -145,21 +176,32 @@ const CartPage = () => {
     }
   };
 
-  const handleDeleteItem = async (itemId, itemType) => {
+  const confirmDeleteItem = (item) => {
+    setItemToDelete(item);
+    setIsDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+
     try {
       await axios.delete(`${apiURL}/cart/remove`, {
-        data: { userId, itemId, itemType },
+        data: { userId, itemId: itemToDelete._id, itemType: itemToDelete.type },
       });
 
-      setCartItems((prev) => prev.filter((item) => item._id !== itemId));
+      setCartItems((prev) => prev.filter((item) => item._id !== itemToDelete._id));
       setAlertStatus("success");
       setAlertMessage("Item removed from cart.");
     } catch (err) {
       console.error("Failed to remove item:", err);
       setAlertStatus("error");
       setAlertMessage("Failed to remove item.");
+    } finally {
+      setIsDialogOpen(false);
+      setItemToDelete(null);
     }
   };
+
 
 
   if (loading)
@@ -208,7 +250,6 @@ const CartPage = () => {
           </Alert>
         </Box>
       )}
-
 
       {cartItems.length === 0 ? (
         <Flex
@@ -268,8 +309,7 @@ const CartPage = () => {
                         size="xs"
                         colorScheme="red"
                         variant="outline"
-                        onClick={() => handleDeleteItem(item._id, item.type)}
-                      >
+                        onClick={() => confirmDeleteItem(item)}                      >
                         Remove
                       </Button>
                     </Box>
@@ -319,6 +359,34 @@ const CartPage = () => {
           </Flex>
         </Box>
       )}
+
+      <AlertDialog
+        isOpen={isDialogOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setIsDialogOpen(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete Item
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you want to remove <strong>{itemToDelete?.name}</strong> from your cart?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button colorScheme="red" onClick={handleConfirmDelete} ml={3}>
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+
     </>
 
   );

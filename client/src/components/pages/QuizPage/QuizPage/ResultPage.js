@@ -6,7 +6,7 @@ export default function ResultPage({ result, onRestart, onAddToCart }) {
 
     const handleAddAndRedirect = async () => {
         try {
-            const savedRecipe = await onAddToCart(result); // Modify to return the new recipe
+            const savedRecipe = await onAddToCart(result);
             navigate('/recipes', { state: { newRecipe: savedRecipe } });
         } catch (err) {
             console.error("Error saving recipe:", err);

@@ -21,11 +21,8 @@ cartRouter.post("/add", async (req, res) => {
             default: return res.status(400).json({ message: 'Invalid item type' });
         }
 
-        console.log('before')
         const item = await itemModel.findById(itemId);
         if (!item) return res.status(404).json({ message: 'Item not found' });
-
-        console.log('after')
 
         let cart = await Cart.findOne({ userId });
 
@@ -46,7 +43,6 @@ cartRouter.post("/add", async (req, res) => {
         res.json(cart);
 
     } catch (error) {
-        console.log(`error = ${error}`)
         res.status(500).json({ message: error.message });
     }
 });
@@ -99,6 +95,7 @@ cartRouter.get('/', async (req, res) => {
 
                 return {
                     _id: item._id,
+                    itemId: item.itemId,
                     name: data?.name || 'Unknown',
                     type: item.itemType,
                     price: item.price,
@@ -199,7 +196,7 @@ cartRouter.delete('/remove', async (req, res) => {
         }
 
         const itemIndex = cart.items.findIndex(
-            (item) => item.itemId.toString() === itemId && item.itemType === itemType
+            (item) => item._id.toString() === itemId && item.itemType === itemType
         );
 
         if (itemIndex === -1) {

@@ -26,7 +26,7 @@ beverageRouter.get('/:id', async (req, res) => {
             return res.status(404).json({ error: 'Beverage not found' });
         }
         res.status(200).send(beverage);
-    } catch {
+    } catch(error) {
         res.status(500).json({ error: `Error in retrieving the beverage: ${error}` });
     }
     finally {

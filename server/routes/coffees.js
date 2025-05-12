@@ -7,7 +7,6 @@ coffeeRouter.use(express.json());
 coffeeRouter.get("/", async (_, res) => {
     try {
         const coffees = await Coffee.find();
-        console.log(coffees);
         if (!coffees) return res.status(404).json({ error: 'Coffees not found' });
         res.status(200).send(coffees);
     } catch (error) {
@@ -26,8 +25,8 @@ coffeeRouter.get('/:id', async (req, res) => {
         if (!coffee) {
             return res.status(404).json({ error: 'Coffee not found' })
         }
-        res.status(200).send(Coffee);
-    } catch {
+        res.status(200).send(coffee);
+    } catch(error) {
         res.status(500).json({ error: `Error in retrieving the coffee: ${error}` });
     }
     finally {

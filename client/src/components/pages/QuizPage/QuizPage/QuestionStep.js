@@ -1,5 +1,4 @@
-// QuestionStep.jsx
-import { VStack, Text, Button, Box } from '@chakra-ui/react';
+import { VStack, Text, Button } from '@chakra-ui/react';
 
 export default function QuestionStep({ question, onAnswer }) {
     return (

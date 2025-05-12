@@ -44,9 +44,7 @@ const addToCart = async (recipe) => {
       userID,
       personalityCoffeeID: recipe._id
     });
-    console.log('Recipe saved:', response.data);
 
-    // ✅ Navigate with new recipe data
     navigate('/recipes', { state: { newRecipe: response.data } });
 
   } catch (error) {

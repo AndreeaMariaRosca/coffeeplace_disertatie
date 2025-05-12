@@ -14,8 +14,7 @@ import {
     Image,
     ModalBody,
     Icon,
-    Wrap,
-    WrapItem,
+    useToast,
 } from "@chakra-ui/react";
 import { FaShoppingCart } from "react-icons/fa";
 import { addToCart } from "../../../utils/drinksApi";
@@ -35,19 +34,18 @@ function Coffee(props) {
     const [editableCoffee, setEditableCoffee] = useState({ ...props });
     const [quantity, setQuantity] = useState(1);
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const toast = useToast();
 
     const basePrice = props.price;
 
-    // Unified color values
     const secondaryBg = useColorModeValue("gray.200", "whiteAlpha.100");
     const mainText = useColorModeValue("#1d1d1d", "whiteAlpha.900");
     const buttonBg = "#53589F";
     const buttonHoverBg = "#7A7CC6";
 
-    // Reset editableCoffee when modal is closed
     useEffect(() => {
         if (!isOpen) {
-            setEditableCoffee({ ...props });  // Reset to original props when modal closes
+            setEditableCoffee({ ...props });
         }
     }, [isOpen, props]);
 
@@ -56,8 +54,24 @@ function Coffee(props) {
             await addToCart(coffeeId, 'Coffee', quantity);
             onClose();
             setQuantity(1);
+            toast({
+                title: "Added to cart",
+                description: `${editableCoffee.name} (${quantity}) has been added to your cart.`,
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+                position: "top",
+            });
         } catch (error) {
             console.error("Error adding to cart:", error);
+            toast({
+                title: "Error",
+                description: "Could not add the item to the cart.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top",
+            });
         }
     };
 
@@ -104,11 +118,10 @@ function Coffee(props) {
                 maxW="400px"
                 overflow="hidden"
             >
-                {/* Container for the image with white background */}
                 <Box
                     w="100%"
                     h="200px"
-                    bg="white" // white background for the image area
+                    bg="white"
                     display="flex"
                     justifyContent="center"
                     alignItems="center"
@@ -116,9 +129,9 @@ function Coffee(props) {
                     <Image
                         src={getImgByCoffeeName(editableCoffee.name)}
                         alt={editableCoffee.name}
-                        maxW="100%" // Ensures the image stays within container width
-                        maxH="100%" // Ensures the image stays within container height
-                        objectFit="contain" // The image will remain fully visible and centered
+                        maxW="100%"
+                        maxH="100%"
+                        objectFit="contain"
                     />
                 </Box>
 
@@ -247,7 +260,6 @@ function Coffee(props) {
                                     ))}
                                 </Flex>
                             </Box>
-                            {/* Quantity Selector */}
                             <Box mt={6} textAlign="center">
                                 <Text fontSize="md" color={mainText} mb={2}>
                                     Quantity:

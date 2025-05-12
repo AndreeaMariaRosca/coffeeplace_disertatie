@@ -36,7 +36,7 @@ export default class RecipesList extends React.Component {
   addNewRecipe = async (newRecipe) => {
     try {
       const getNewPersonalityCoffee = await axios.get(
-        `http://localhost:8080/api/personalityCoffee/by-id/${newRecipe.personalityCoffeeID}`
+        `http://localhost:8080/api/personalityCoffees/by-id/${newRecipe.personalityCoffeeID}`
       );
 
       const newCoffee = Array.isArray(getNewPersonalityCoffee.data)
@@ -83,16 +83,17 @@ export default class RecipesList extends React.Component {
               <Center>
                 <VStack spacing={4} align="center" maxW="600px">
                   <Text fontSize="lg" color="gray.700" textAlign="center">
-                    Your unique traits shape <Text as="span" fontWeight="bold" color="teal.600">every sip</Text>.
-                    By completing a short and fun quiz about your preferences — including your
-                    <Text as="span" fontWeight="semibold"> sex</Text>,
-                    <Text as="span" fontWeight="semibold"> favorite genre</Text>,
-                    <Text as="span" fontWeight="semibold"> color</Text>,
-                    <Text as="span" fontWeight="semibold"> season</Text>, whether you're a
-                    <Text as="span" fontWeight="semibold"> morning bird</Text> or
-                    <Text as="span" fontWeight="semibold"> night owl</Text>, and your
-                    <Text as="span" fontWeight="semibold"> zodiac sign</Text> — we craft a custom coffee recipe that matches your
-                    <Text as="span" fontWeight="bold" color="teal.600"> vibe</Text>.
+                    Your perfect coffee match is more than a flavor — it's a <Text as="span" fontWeight="bold" color="teal.600">reflection of your rhythm</Text>.
+                    By answering a quick and engaging quiz about how you
+                    <Text as="span" fontWeight="semibold"> start your day</Text>,
+                    your favorite <Text as="span" fontWeight="semibold"> season</Text>,
+                    <Text as="span" fontWeight="semibold"> coffee shop vibe</Text>,
+                    <Text as="span" fontWeight="semibold"> music style</Text>,
+                    preferred <Text as="span" fontWeight="semibold"> afternoon pace</Text>,
+                    go-to <Text as="span" fontWeight="semibold"> treat</Text>, and
+                    your signature <Text as="span" fontWeight="semibold"> color</Text>,
+                    we blend a coffee that captures your personal
+                    <Text as="span" fontWeight="bold" color="teal.600"> essence</Text>.
                   </Text>
 
                   <Text fontSize="lg" color="gray.700" textAlign="center">

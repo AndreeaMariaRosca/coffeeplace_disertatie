@@ -52,11 +52,9 @@ export default class CoffeePage extends React.Component {
   }
 
   handleSaveCoffee(updatedCoffee) {
-    // Update coffee on the server
     axios
       .put(`/api/coffees/${updatedCoffee._id}`, updatedCoffee)
       .then(() => {
-        // Update local state
         const updatedTableData = this.state.orgtableData.map((coffee) =>
           coffee._id === updatedCoffee._id ? updatedCoffee : coffee
         );

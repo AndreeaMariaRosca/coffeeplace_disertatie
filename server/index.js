@@ -40,18 +40,10 @@ app.use("/api/cart", cartRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/coffees", coffeeRouter);
 app.use("/api/beverages", beverageRouter);
-app.use("/api/personalityCoffee", personalityCoffeeRouter);
+app.use("/api/personalityCoffees", personalityCoffeeRouter);
 app.use("/api/recipes", recipeRouter);
 
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
   })
-
-
-  // todo: on login, if username and password match, generate a jwt token that contains the user's role, the user's id + private key
-  // jwt = json web token
-  // todo: in announcement creation controller, get the request body and enhance it with the user id from the authorization header (jwt)
-  
-// todo: when saving in db the password that needs to be hashed
-// todo: when saving in db the name/email address that needs to be encrypted

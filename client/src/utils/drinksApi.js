@@ -22,7 +22,7 @@ export const getBeverages = async () => {
 }
 
 export const getPersonalityCoffee = async () => {
-    const apiURL = `${basePath}/personalityCoffee`;
+    const apiURL = `${basePath}/personalityCoffees`;
     const result = await axios.get(apiURL);
     if (result.data) {
         return result.data;

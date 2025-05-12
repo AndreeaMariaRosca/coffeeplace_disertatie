@@ -20,7 +20,6 @@ recipeRouter.get("/", async (req, res) => {
             const personalityCoffee = await PersonalityCoffee.findOne({ _id: coffee.personalityCoffeeID });
             personalityCoffees.push(personalityCoffee);
         }
-        console.log(`====in get personalityCoffees = ${JSON.stringify(personalityCoffees)}`)
         res.status(200).send(personalityCoffees);
     } catch (error) {
         res.status(500).send(`Error in retrieving all personality coffees: ${error}`);
@@ -34,7 +33,6 @@ recipeRouter.post('/', async (request, response) => {
     const { body } = request;
 
     try {
-        console.log(`====body in post ${JSON.stringify(body)}`)
         const recipe = await new Recipe(body).save();
         response.status(201).send(recipe);
     } catch (error) {
@@ -47,7 +45,6 @@ recipeRouter.post('/', async (request, response) => {
 
 recipeRouter.delete('/:recipeID', async (req, res) => {
     try {
-        console.log("in delete")
         const { recipeID } = req.params;
         const deletedRecipe = await Recipe.findOneAndDelete({personalityCoffeeID: recipeID});
         if (!deletedRecipe) {

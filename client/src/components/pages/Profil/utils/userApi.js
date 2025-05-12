@@ -3,7 +3,6 @@ import { getUserId } from '../../../../utils/storage';
 
 export const getCurrentUser = async () => {
     const userId = getUserId();
-    console.log(`===userId ${userId}`);
     if (!userId) {
         return null;
     }

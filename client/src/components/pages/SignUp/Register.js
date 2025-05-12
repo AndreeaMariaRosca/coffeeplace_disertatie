@@ -49,33 +49,25 @@ class Register extends Component {
     validateUser() {
         let isValid = true;
         let errors = this.getEmptyErrorObject();
-        console.log("email: ", this.state.email);
         if (!this.validateEmail(this.state.email)) {
             errors = this.setErrorField(errors, { email: "Email invalid." });
             isValid = false;
         }
-        console.log("pass: ", this.state.password);
 
         if (this.state.password.length < 8 || this.state.password.trim() === "") {
             errors = this.setErrorField(errors, { password: "Parola trebuie sa contina cel putin 8 caractere." });
             isValid = false;
         }
-        console.log("username: ", this.state.username);
 
         if (this.state.username.trim() === "") {
             errors = this.setErrorField(errors, { username: "Nume de utilizator invalid!" });
             isValid = false;
         }
 
-        console.log("confirm pass: ", this.state.confirmPassword);
-
         if (this.state.confirmPassword !== this.state.password) {
             errors = this.setErrorField(errors, { confirmPassword: "Parolele nu coincid!" })
             isValid = false;
         }
-
-
-        console.log(errors);
 
         this.setState({ errors });
 
@@ -92,7 +84,6 @@ class Register extends Component {
                 username: this.state.username
             }
 
-            console.log(newUser);
             try {
                 // todo: fix this in case register fails
                 this.functions.register(newUser)
